@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Turbo House</title>
+        <link rel="stylesheet" type="text/css" href="css/account.css">
+            <link rel="icon" href="images/logo (2).png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <style>
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="products.html">Каталог домов</a></li>
+                <li><a href="account.html" class="active">Личный кабинет</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Блок авторизации/регистрации -->
+        <div id="auth-forms" class="auth-container">
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Вход</div>
+                <div class="auth-tab" data-tab="register">Регистрация</div>
+            </div>
+            
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                
+                <div id="login-error" class="error-message"></div>
+                
+                <button type="submit" class="btn-submit">Войти</button>
+            </form>
+            
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-name">Имя</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-phone">Телефон</label>
+                    <input type="tel" id="register-phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-confirm">Подтвердите пароль</label>
+                    <input type="password" id="register-confirm" required>
+                </div>
+                
+                <div id="register-error" class="error-message"></div>
+                
+                <button type="submit" class="btn-submit">Зарегистрироваться</button>
+            </form>
+        </div>
+        
+        <!-- Блок личного кабинета -->
+        <div id="account-content" class="account-container">
+            <div class="account-header">
+                <div class="user-greeting">
+                    <h2>Добро пожаловать, <span id="user-name"></span>!</h2>
+                    <p>Email: <span id="user-email"></span></p>
+                </div>
+                <button class="logout-btn" id="logout-btn">Выйти</button>
+            </div>
+            
+            <div class="account-sections">
+                <div class="account-nav">
+                    <ul>
+                        <li><a href="#" class="active" data-section="profile">Профиль</a></li>
+                        <li><a href="#" data-section="orders">Мои заказы</a></li>
+                        <li><a href="#" data-section="cart">Корзина</a></li>
+                    </ul>
+                </div>
+                
+                <div class="account-content">
+                    <div class="account-section active" id="profile-section">
+                        <h3 class="section-title">Личные данные</h3>
+                        <div class="user-info">
+                            <p><strong>Имя:</strong> <span id="profile-name"></span></p>
+                            <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                            <p><strong>Телефон:</strong> <span id="profile-phone"></span></p>
+                            <p><strong>Дата регистрации:</strong> <span id="profile-date"></span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="account-section" id="orders-section">
+                        <h3 class="section-title">История заказов</h3>
+                        <div class="order-list" id="order-list">
+                            <h3>Заказ <span>89004543598325-234</span></h3>
+                        </div>
+                    </div>
+                    
+                    <div class="account-section" id="cart-section">
+                        <h3 class="section-title">Корзина</h3>
+                        <div class="cart-items" id="account-cart-items">
+                            <p>Корзина пуста</p>
+                        </div>
+                        <div class="cart-total">
+                            <p><strong>Итого:</strong> <span id="account-cart-total">0</span> руб.</p>
+                            <button class="btn-primary" id="checkout-btn">Оформить заказ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Turbo House ИП Стадникова М.А.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию при загрузке
+            checkAuth();
+            
+            // Переключение между вкладками входа и регистрации
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabName = this.getAttribute('data-tab');
+                    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                    document.getElementById(`${tabName}-form`).classList.add('active');
+                });
+            });
+
+            // Обработка формы входа
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value.trim();
+                
+                // Проверка заполнения полей
+                if (!email || !password) {
+                    document.getElementById('login-error').textContent = 'Заполните все поля';
+                    return;
+                }
+                
+                fetch('php/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        email: email,
+                        password: password
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка сети');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Сохраняем данные пользователя
+                        localStorage.setItem('auth_token', data.token);
+                        localStorage.setItem('user_data', JSON.stringify(data.user));
+                        
+                        // Показываем личный кабинет
+                        showAccountPage(data.user);
+                    } else {
+                        document.getElementById('login-error').textContent = data.message || 'Ошибка входа';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('login-error').textContent = 'Ошибка соединения с сервером';
+                });
+            });
+
+            // Обработка формы регистрации
+            document.getElementById('register-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value.trim();
+                const email = document.getElementById('register-email').value.trim();
+                const phone = document.getElementById('register-phone').value.trim();
+                const password = document.getElementById('register-password').value.trim();
+                const confirm = document.getElementById('register-confirm').value.trim();
+                
+                // Проверка заполнения полей
+                if (!name || !email || !phone || !password || !confirm) {
+                    document.getElementById('register-error').textContent = 'Заполните все поля';
+                    return;
+                }
+                
+                if (password !== confirm) {
+                    document.getElementById('register-error').textContent = 'Пароли не совпадают';
+                    return;
+                }
+                
+                fetch('php/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'register',
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        password: password,
+                        confirm: confirm
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка сети');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Сохраняем данные пользователя
+                        localStorage.setItem('auth_token', data.token);
+                        localStorage.setItem('user_data', JSON.stringify(data.user));
+                        
+                        // Показываем личный кабинет
+                        showAccountPage(data.user);
+                    } else {
+                        document.getElementById('register-error').textContent = data.message || 'Ошибка регистрации';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('register-error').textContent = 'Ошибка соединения с сервером';
+                });
+            });
+            
+            // Выход из системы
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
+                location.reload();
+            });
+            
+            // Переключение между разделами личного кабинета
+            document.querySelectorAll('.account-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    document.querySelectorAll('.account-nav a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const section = this.getAttribute('data-section');
+                    document.querySelectorAll('.account-section').forEach(s => s.classList.remove('active'));
+                    document.getElementById(`${section}-section`).classList.add('active');
+                });
+            });
+        });
+
+        // Проверка авторизации
+        function checkAuth() {
+            const token = localStorage.getItem('auth_token');
+            const userData = localStorage.getItem('user_data');
+            
+            if (token && userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    showAccountPage(user);
+                } catch (e) {
+                    console.error('Ошибка парсинга данных пользователя:', e);
+                    showAuthForms();
+                }
+            } else {
+                showAuthForms();
+            }
+        }
+
+        // Показать формы авторизации
+        function showAuthForms() {
+            document.getElementById('auth-forms').style.display = 'block';
+            document.getElementById('account-content').style.display = 'none';
+        }
+
+        // Показать личный кабинет
+        function showAccountPage(user) {
+            document.getElementById('auth-forms').style.display = 'none';
+            document.getElementById('account-content').style.display = 'block';
+            
+            // Заполняем данные пользователя
+            document.getElementById('user-name').textContent = user.name;
+            document.getElementById('user-email').textContent = user.email;
+            
+            document.getElementById('profile-name').textContent = user.name;
+            document.getElementById('profile-email').textContent = user.email;
+            document.getElementById('profile-phone').textContent = user.phone;
+            document.getElementById('profile-date').textContent = new Date(user.created_at).toLocaleDateString();
+            
+            // Перенаправляем на account.html если мы не на этой странице
+            if (!window.location.pathname.endsWith('account.html')) {
+                window.location.href = 'account.html';
+            }
+        }
+    </script>
+</body>
+</html>

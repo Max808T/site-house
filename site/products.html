@@ -1,0 +1,46 @@
+ <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turbo House - Дома</title>
+    <link rel="icon" href="images/logo (2).png" type="image/png">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="products.html">Каталог домов</a></li>
+                <li><a href="account.html">Личный кабинет</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="products">
+            <h2>Наши дома</h2>
+            <div class="product-list" id="product-list">
+                <!-- Товары будут добавляться сюда с помощью PHP -->
+            </div>
+        </section>
+
+        <section class="cart">
+            <h3>Корзина</h3>
+            <div class="cart-items" id="cart-items">
+                <!-- Товары в корзине будут добавляться сюда -->
+            </div>
+            <div class="cart-total">
+                <p>Общая стоимость: <span id="cart-total">0</span> руб.</p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Turbo House ИП Стадникова М.А.</p>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script src="/site/js/check_auth.js"></script>
+</body>
+</html>
